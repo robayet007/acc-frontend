@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle } from 'lucide-react'
 
 // API Service
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://52.62.132.187:5000/api';
 
 const apiService = {
   async getNotes() {
