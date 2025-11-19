@@ -1,5 +1,51 @@
-import React, { useState } from 'react'
-import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle } from 'lucide-react'
+
+// API Service
+const API_BASE_URL = 'http://localhost:5000/api';
+
+const apiService = {
+  async getNotes() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notes`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+      throw error;
+    }
+  },
+
+  async createNote(noteData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(noteData),
+      });
+      if (!response.ok) throw new Error('Network response was not ok');
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating note:', error);
+      throw error;
+    }
+  },
+
+  async deleteNote(noteId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Network response was not ok');
+      return await response.json();
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      throw error;
+    }
+  }
+};
 
 function App() {
   const [selectedChapter, setSelectedChapter] = useState(null)
@@ -9,6 +55,28 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPaperFilter, setSelectedPaperFilter] = useState('all')
   const [selectedNoteId, setSelectedNoteId] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const [noteToDelete, setNoteToDelete] = useState(null)
+
+  // Load notes from backend on component mount
+  useEffect(() => {
+    loadNotes();
+  }, []);
+
+  const loadNotes = async () => {
+    setLoading(true);
+    try {
+      const allNotes = await apiService.getNotes();
+      setNotes(allNotes);
+    } catch (error) {
+      console.error('Error loading notes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const accounting1Chapters = [
     { id: 1, title: "হিসাববিজ্ঞান পরিচিতি", paper: "1st Paper" },
@@ -41,11 +109,28 @@ function App() {
     )
   }
 
-  const deleteNote = (noteId) => {
-    if (window.confirm('এই নোটটি মুছে ফেলতে চান?')) {
-      setNotes(prev => prev.filter(note => note.id !== noteId))
-      setSelectedNoteId(null)
-      setCurrentImageIndex(0)
+  const deleteNote = async (noteId) => {
+    setNoteToDelete(noteId);
+    setShowPinModal(true);
+  }
+
+  const handlePinSubmit = async () => {
+    if (pinInput === '5566') {
+      try {
+        await apiService.deleteNote(noteToDelete);
+        setNotes(prev => prev.filter(note => note._id !== noteToDelete));
+        setSelectedNoteId(null);
+        setCurrentImageIndex(0);
+        setShowPinModal(false);
+        setPinInput('');
+        setNoteToDelete(null);
+      } catch (error) {
+        console.error('Error deleting note:', error);
+        alert('নোট মুছতে সমস্যা হয়েছে');
+      }
+    } else {
+      alert('ভুল PIN! সঠিক PIN দিন।');
+      setPinInput('');
     }
   }
 
@@ -56,12 +141,68 @@ function App() {
     )
   }
 
+  const SuccessPopup = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-green-100 p-3 rounded-full">
+            <CheckCircle className="text-green-600" size={32} />
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">নোট যোগ করা হয়েছে!</h3>
+        <p className="text-gray-600 mb-6">আপনার নোট সফলভাবে সংরক্ষণ করা হয়েছে।</p>
+        <button
+          onClick={() => setShowSuccessPopup(false)}
+          className="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-semibold transition-all"
+        >
+          ঠিক আছে
+        </button>
+      </div>
+    </div>
+  )
+
+  const PinModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-sm mx-4">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">PIN দিন</h3>
+        <p className="text-gray-600 mb-4 text-center">নোট মুছতে PIN প্রয়োজন</p>
+        <input
+          type="password"
+          value={pinInput}
+          onChange={(e) => setPinInput(e.target.value)}
+          placeholder="PIN লিখুন"
+          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all text-center text-lg"
+        />
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={() => {
+              setShowPinModal(false);
+              setPinInput('');
+              setNoteToDelete(null);
+            }}
+            className="flex-1 bg-gray-500 text-white py-3 rounded-xl hover:bg-gray-600 font-semibold transition-all"
+          >
+            বাতিল
+          </button>
+          <button
+            onClick={handlePinSubmit}
+            className="flex-1 bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 font-semibold transition-all"
+          >
+            মুছুন
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
   const AddNotesForm = () => {
     const [title, setTitle] = useState('')
+    const [authorName, setAuthorName] = useState('')
     const [selectedPaper, setSelectedPaper] = useState(selectedChapter ? selectedChapter.paper : '1st Paper')
     const [selectedChapterId, setSelectedChapterId] = useState(selectedChapter ? selectedChapter.id.toString() : '1')
     const [uploadedImages, setUploadedImages] = useState([])
     const [isDragging, setIsDragging] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
 
     const handleImageUpload = (e) => {
       const files = Array.from(e.target.files)
@@ -90,25 +231,35 @@ function App() {
       setUploadedImages(prev => prev.filter((_, i) => i !== index))
     }
 
-    const handleSubmit = () => {
-      if (!title || uploadedImages.length === 0) {
-        alert('দয়া করে শিরোনাম এবং ছবি যোগ করুন')
+    const handleSubmit = async () => {
+      if (!title || !authorName || uploadedImages.length === 0) {
+        alert('দয়া করে শিরোনাম, আপনার নাম এবং ছবি যোগ করুন')
         return
       }
       
-      const newNote = {
-        id: Date.now(),
-        title,
-        paper: selectedPaper,
-        chapterId: parseInt(selectedChapterId),
-        images: uploadedImages,
-        createdAt: new Date().toLocaleDateString('bn-BD')
+      setSubmitting(true);
+      try {
+        const newNote = {
+          title,
+          authorName,
+          paper: selectedPaper,
+          chapterId: parseInt(selectedChapterId),
+          images: uploadedImages,
+        };
+        
+        const savedNote = await apiService.createNote(newNote);
+        setNotes(prev => [...prev, savedNote]);
+        setShowAddForm(false);
+        setTitle('');
+        setAuthorName('');
+        setUploadedImages([]);
+        setShowSuccessPopup(true);
+      } catch (error) {
+        console.error('Error creating note:', error);
+        alert('নোট সংরক্ষণ করতে সমস্যা হয়েছে। সার্ভার চেক করুন।');
+      } finally {
+        setSubmitting(false);
       }
-      
-      setNotes(prev => [...prev, newNote])
-      setShowAddForm(false)
-      setTitle('')
-      setUploadedImages([])
     }
 
     const availableChapters = selectedPaper === '1st Paper' ? accounting1Chapters : accounting2Chapters
@@ -139,6 +290,17 @@ function App() {
               onChange={(e) => setTitle(e.target.value)}
               className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
               placeholder="যেমন: অধ্যায় ১ - সম্পূর্ণ নোট"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2 font-semibold">আপনার নাম</label>
+            <input
+              type="text"
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
+              placeholder="আপনার নাম লিখুন"
             />
           </div>
 
@@ -241,10 +403,10 @@ function App() {
 
           <button
             onClick={handleSubmit}
-            disabled={uploadedImages.length === 0}
+            disabled={uploadedImages.length === 0 || !title || !authorName || submitting}
             className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            নোট সংরক্ষণ করুন
+            {submitting ? 'সংরক্ষণ করা হচ্ছে...' : 'নোট সংরক্ষণ করুন'}
           </button>
         </div>
       </div>
@@ -253,7 +415,7 @@ function App() {
 
   const NotesViewer = () => {
     const chapterNotes = getChapterNotes(selectedChapter)
-    const selectedNote = chapterNotes.find(note => note.id === selectedNoteId)
+    const selectedNote = chapterNotes.find(note => note._id === selectedNoteId)
 
     return (
       <div className="max-w-6xl mx-auto">
@@ -300,9 +462,15 @@ function App() {
                   <ArrowLeft size={18} />
                   নোট তালিকায় ফিরুন
                 </button>
-                <h3 className="text-xl font-bold text-gray-800">{selectedNote.title}</h3>
+                <div className="text-center">
+                  <h3 className="text-xl font-bold text-gray-800">{selectedNote.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
+                    <User size={16} />
+                    {selectedNote.authorName} - এর নোট
+                  </p>
+                </div>
                 <button
-                  onClick={() => deleteNote(selectedNote.id)}
+                  onClick={() => deleteNote(selectedNote._id)}
                   className="flex items-center gap-2 text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-2 rounded-lg transition-all font-semibold"
                 >
                   <Trash2 size={18} />
@@ -352,9 +520,9 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {chapterNotes.map(note => (
                   <div 
-                    key={note.id}
+                    key={note._id}
                     onClick={() => {
-                      setSelectedNoteId(note.id)
+                      setSelectedNoteId(note._id)
                       setCurrentImageIndex(0)
                     }}
                     className="bg-white p-5 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-400 transition-all transform hover:-translate-y-1"
@@ -370,7 +538,15 @@ function App() {
                       </div>
                     </div>
                     <h3 className="font-bold text-gray-800 text-lg mb-2">{note.title}</h3>
-                    <p className="text-sm text-gray-500">তারিখ: {note.createdAt}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <User size={14} />
+                        {note.authorName}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        তারিখ: {new Date(note.createdAt).toLocaleDateString('bn-BD')}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -406,6 +582,13 @@ function App() {
           <h1 className="text-5xl font-bold text-gray-800 mb-3">হিসাববিজ্ঞান নোট</h1>
           <p className="text-gray-600 text-xl">১ম ও ২য় পত্রের সকল অধ্যায়ের নোট এক জায়গায়</p>
         </div>
+
+        {loading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+            <p className="text-gray-600 mt-2">নোট লোড হচ্ছে...</p>
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
@@ -461,6 +644,7 @@ function App() {
           </button>
         </div>
 
+        {/* Rest of the ChaptersList component remains the same */}
         {(selectedPaperFilter === 'all' || selectedPaperFilter === '1st') && filtered1st.length > 0 && (
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-3">
@@ -570,6 +754,12 @@ function App() {
         ) : (
           <ChaptersList />
         )}
+        
+        {/* Success Popup */}
+        {showSuccessPopup && <SuccessPopup />}
+        
+        {/* PIN Modal for Delete */}
+        {showPinModal && <PinModal />}
       </div>
     </div>
   )
