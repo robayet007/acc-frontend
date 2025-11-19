@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle } from 'lucide-react'
 
-// API Service
+// API Service - UPDATED
 const API_BASE_URL = '/api';
 
 const apiService = {
@@ -18,14 +18,29 @@ const apiService = {
 
   async createNote(noteData) {
     try {
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('title', noteData.title);
+      formData.append('authorName', noteData.authorName);
+      formData.append('paper', noteData.paper);
+      formData.append('chapterId', noteData.chapterId.toString());
+      
+      // Add image files
+      noteData.images.forEach((imageFile, index) => {
+        formData.append('images', imageFile);
+      });
+
       const response = await fetch(`${API_BASE_URL}/notes`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(noteData),
+        body: formData,
       });
-      if (!response.ok) throw new Error('Network response was not ok');
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
+      }
+      
       return await response.json();
     } catch (error) {
       console.error('Error creating note:', error);
@@ -201,13 +216,13 @@ function App() {
     const [selectedPaper, setSelectedPaper] = useState(selectedChapter ? selectedChapter.paper : '1st Paper')
     const [selectedChapterId, setSelectedChapterId] = useState(selectedChapter ? selectedChapter.id.toString() : '1')
     const [uploadedImages, setUploadedImages] = useState([])
+    const [uploadedFiles, setUploadedFiles] = useState([]) // NEW STATE
     const [isDragging, setIsDragging] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     const handleImageUpload = (e) => {
       const files = Array.from(e.target.files)
-      const imagePreviews = files.map(file => URL.createObjectURL(file))
-      setUploadedImages(prev => [...prev, ...imagePreviews])
+      handleFiles(files)
     }
 
     const handleDragOver = (e) => {
@@ -223,16 +238,23 @@ function App() {
       e.preventDefault()
       setIsDragging(false)
       const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'))
+      handleFiles(files)
+    }
+
+    // NEW FUNCTION - Handle both drag and file input
+    const handleFiles = (files) => {
       const imagePreviews = files.map(file => URL.createObjectURL(file))
       setUploadedImages(prev => [...prev, ...imagePreviews])
+      setUploadedFiles(prev => [...prev, ...files]) // Store actual File objects
     }
 
     const removeImage = (index) => {
       setUploadedImages(prev => prev.filter((_, i) => i !== index))
+      setUploadedFiles(prev => prev.filter((_, i) => i !== index))
     }
 
     const handleSubmit = async () => {
-      if (!title || !authorName || uploadedImages.length === 0) {
+      if (!title || !authorName || uploadedFiles.length === 0) {
         alert('দয়া করে শিরোনাম, আপনার নাম এবং ছবি যোগ করুন')
         return
       }
@@ -244,7 +266,7 @@ function App() {
           authorName,
           paper: selectedPaper,
           chapterId: parseInt(selectedChapterId),
-          images: uploadedImages,
+          images: uploadedFiles, // Send actual File objects
         };
         
         const savedNote = await apiService.createNote(newNote);
@@ -253,10 +275,11 @@ function App() {
         setTitle('');
         setAuthorName('');
         setUploadedImages([]);
+        setUploadedFiles([]); // Clear files too
         setShowSuccessPopup(true);
       } catch (error) {
         console.error('Error creating note:', error);
-        alert('নোট সংরক্ষণ করতে সমস্যা হয়েছে। সার্ভার চেক করুন।');
+        alert(`নোট সংরক্ষণ করতে সমস্যা হয়েছে: ${error.message}`);
       } finally {
         setSubmitting(false);
       }
@@ -403,7 +426,7 @@ function App() {
 
           <button
             onClick={handleSubmit}
-            disabled={uploadedImages.length === 0 || !title || !authorName || submitting}
+            disabled={uploadedFiles.length === 0 || !title || !authorName || submitting}
             className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'সংরক্ষণ করা হচ্ছে...' : 'নোট সংরক্ষণ করুন'}
@@ -644,7 +667,6 @@ function App() {
           </button>
         </div>
 
-        {/* Rest of the ChaptersList component remains the same */}
         {(selectedPaperFilter === 'all' || selectedPaperFilter === '1st') && filtered1st.length > 0 && (
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-3">
@@ -765,4 +787,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
