@@ -2,39 +2,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://52.62.132.187:5000/api/:path*"
+      "destination": "https://52.62.132.187:5000/api/:path*"
     },
     {
-      "source": "/uploads/:path*",
-      "destination": "http://52.62.132.187:5000/uploads/:path*"
+      "source": "/uploads/:path*", 
+      "destination": "https://52.62.132.187:5000/uploads/:path*"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "x-forwarded-proto",
-          "value": "http"
-        }
-      ]
-    },
-    {
-      "source": "/uploads/(.*)",
-      "headers": [
-        {
-          "key": "x-forwarded-proto", 
-          "value": "http"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
     }
   ]
 }
