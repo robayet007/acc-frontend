@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle } from 'lucide-react'
 
-// API Service - UPDATED
+// API Service - Updated for Vercel proxy
 const API_BASE_URL = '/api';
 
 const apiService = {
@@ -11,13 +11,14 @@ const apiService = {
       if (!response.ok) throw new Error('Network response was not ok');
       const notes = await response.json();
       
-      // Ensure images have full URLs
+      // Images will be served through /uploads proxy
       return notes.map(note => ({
         ...note,
         images: note.images.map(img => {
           if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return `https://52.62.132.187:5000${img}`;
-          return img;
+          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
+          // If it's just the filename, prepend /uploads
+          return `/uploads/${img}`;
         })
       }));
     } catch (error) {
@@ -53,13 +54,13 @@ const apiService = {
       
       const savedNote = await response.json();
       
-      // Ensure response images have full URLs
+      // Ensure response images use /uploads proxy path
       return {
         ...savedNote,
         images: savedNote.images.map(img => {
           if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return `/api${img}`;
-          return img;
+          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
+          return `/uploads/${img}`;
         })
       };
     } catch (error) {
@@ -459,13 +460,6 @@ function App() {
     const chapterNotes = getChapterNotes(selectedChapter)
     const selectedNote = chapterNotes.find(note => note._id === selectedNoteId)
 
-    // Helper function to get image URL
-    const getImageUrl = (imagePath) => {
-      if (imagePath.startsWith('http')) return imagePath;
-      if (imagePath.startsWith('/uploads')) return `https://52.62.132.187:5000${imagePath}`;
-      return imagePath;
-    }
-
     return (
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
@@ -527,9 +521,13 @@ function App() {
                 </button>
               </div>
               <img 
-                src={getImageUrl(selectedNote.images[currentImageIndex])}
+                src={selectedNote.images[currentImageIndex]}
                 alt={`Note page ${currentImageIndex + 1}`}
                 className="w-full h-auto max-h-[700px] object-contain mx-auto rounded-lg shadow-md"
+                onError={(e) => {
+                  console.error('Image failed to load:', selectedNote.images[currentImageIndex]);
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+                }}
               />
             </div>
 
@@ -578,9 +576,13 @@ function App() {
                   >
                     <div className="relative mb-4 overflow-hidden rounded-lg">
                       <img 
-                        src={getImageUrl(note.images[0])}
+                        src={note.images[0]}
                         alt={note.title}
                         className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          console.error('Thumbnail failed to load:', note.images[0]);
+                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f0f0f0" width="300" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                        }}
                       />
                       <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
                         {note.images.length} পৃষ্ঠা
@@ -803,14 +805,11 @@ function App() {
           <ChaptersList />
         )}
         
-        {/* Success Popup */}
         {showSuccessPopup && <SuccessPopup />}
-        
-        {/* PIN Modal for Delete */}
         {showPinModal && <PinModal />}
       </div>
     </div>
   )
 }
 
-export default App;
+export default App
