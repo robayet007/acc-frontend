@@ -5,7 +5,7 @@
       "destination": "http://52.62.132.187:5000/api/:path*"
     },
     {
-      "source": "/uploads/:path*", 
+      "source": "/uploads/:path*",
       "destination": "http://52.62.132.187:5000/uploads/:path*"
     },
     {
@@ -18,22 +18,18 @@
       "source": "/api/(.*)",
       "headers": [
         {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,POST,PUT,DELETE,OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+          "key": "x-forwarded-proto",
+          "value": "http"
         }
       ]
     },
     {
       "source": "/uploads/(.*)",
       "headers": [
+        {
+          "key": "x-forwarded-proto", 
+          "value": "http"
+        },
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
