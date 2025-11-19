@@ -58,7 +58,7 @@ const apiService = {
         ...savedNote,
         images: savedNote.images.map(img => {
           if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return `https://52.62.132.187:5000${img}`;
+          if (img.startsWith('/uploads')) return `/api${img}`;
           return img;
         })
       };
