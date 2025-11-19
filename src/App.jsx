@@ -9,7 +9,17 @@ const apiService = {
     try {
       const response = await fetch(`${API_BASE_URL}/notes`);
       if (!response.ok) throw new Error('Network response was not ok');
-      return await response.json();
+      const notes = await response.json();
+      
+      // Ensure images have full URLs
+      return notes.map(note => ({
+        ...note,
+        images: note.images.map(img => {
+          if (img.startsWith('http')) return img;
+          if (img.startsWith('/uploads')) return `https://52.62.132.187:5000${img}`;
+          return img;
+        })
+      }));
     } catch (error) {
       console.error('Error fetching notes:', error);
       throw error;
@@ -41,7 +51,17 @@ const apiService = {
         throw new Error(`Server error: ${response.status} - ${errorText}`);
       }
       
-      return await response.json();
+      const savedNote = await response.json();
+      
+      // Ensure response images have full URLs
+      return {
+        ...savedNote,
+        images: savedNote.images.map(img => {
+          if (img.startsWith('http')) return img;
+          if (img.startsWith('/uploads')) return `https://52.62.132.187:5000${img}`;
+          return img;
+        })
+      };
     } catch (error) {
       console.error('Error creating note:', error);
       throw error;
@@ -216,7 +236,7 @@ function App() {
     const [selectedPaper, setSelectedPaper] = useState(selectedChapter ? selectedChapter.paper : '1st Paper')
     const [selectedChapterId, setSelectedChapterId] = useState(selectedChapter ? selectedChapter.id.toString() : '1')
     const [uploadedImages, setUploadedImages] = useState([])
-    const [uploadedFiles, setUploadedFiles] = useState([]) // NEW STATE
+    const [uploadedFiles, setUploadedFiles] = useState([])
     const [isDragging, setIsDragging] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
@@ -241,11 +261,10 @@ function App() {
       handleFiles(files)
     }
 
-    // NEW FUNCTION - Handle both drag and file input
     const handleFiles = (files) => {
       const imagePreviews = files.map(file => URL.createObjectURL(file))
       setUploadedImages(prev => [...prev, ...imagePreviews])
-      setUploadedFiles(prev => [...prev, ...files]) // Store actual File objects
+      setUploadedFiles(prev => [...prev, ...files])
     }
 
     const removeImage = (index) => {
@@ -266,7 +285,7 @@ function App() {
           authorName,
           paper: selectedPaper,
           chapterId: parseInt(selectedChapterId),
-          images: uploadedFiles, // Send actual File objects
+          images: uploadedFiles,
         };
         
         const savedNote = await apiService.createNote(newNote);
@@ -275,7 +294,7 @@ function App() {
         setTitle('');
         setAuthorName('');
         setUploadedImages([]);
-        setUploadedFiles([]); // Clear files too
+        setUploadedFiles([]);
         setShowSuccessPopup(true);
       } catch (error) {
         console.error('Error creating note:', error);
@@ -440,6 +459,13 @@ function App() {
     const chapterNotes = getChapterNotes(selectedChapter)
     const selectedNote = chapterNotes.find(note => note._id === selectedNoteId)
 
+    // Helper function to get image URL
+    const getImageUrl = (imagePath) => {
+      if (imagePath.startsWith('http')) return imagePath;
+      if (imagePath.startsWith('/uploads')) return `https://52.62.132.187:5000${imagePath}`;
+      return imagePath;
+    }
+
     return (
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
@@ -501,7 +527,7 @@ function App() {
                 </button>
               </div>
               <img 
-                src={selectedNote.images[currentImageIndex]} 
+                src={getImageUrl(selectedNote.images[currentImageIndex])}
                 alt={`Note page ${currentImageIndex + 1}`}
                 className="w-full h-auto max-h-[700px] object-contain mx-auto rounded-lg shadow-md"
               />
@@ -552,7 +578,7 @@ function App() {
                   >
                     <div className="relative mb-4 overflow-hidden rounded-lg">
                       <img 
-                        src={note.images[0]} 
+                        src={getImageUrl(note.images[0])}
                         alt={note.title}
                         className="w-full h-48 object-cover"
                       />
