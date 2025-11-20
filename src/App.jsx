@@ -809,13 +809,13 @@ function App() {
                   </p>
                 </div>
                 <div className="flex gap-2 justify-center md:justify-end">
-                  <button
+                  {/* <button
                     onClick={() => editNote(selectedNote)}
                     className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg hover:bg-blue-700 transition-all font-semibold text-xs md:text-sm"
                   >
                     <Edit size={14} />
                     <span>এডিট</span>
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => deleteNote(selectedNote._id)}
                     className="flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg hover:bg-red-700 transition-all font-semibold text-xs md:text-sm"
