@@ -220,8 +220,8 @@ function App() {
   }
 
   const SuccessPopup = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm mx-auto text-center">
         <div className="flex justify-center mb-4">
           <div className="bg-green-100 p-3 rounded-full">
             <CheckCircle className="text-green-600" size={32} />
@@ -240,8 +240,8 @@ function App() {
   )
 
   const PinModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-sm mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm mx-auto">
         <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">PIN দিন</h3>
         <p className="text-gray-600 mb-4 text-center">নোট মুছতে PIN প্রয়োজন</p>
         <input
@@ -350,19 +350,19 @@ function App() {
     const availableChapters = selectedPaper === '1st Paper' ? accounting1Chapters : accounting2Chapters
 
     return (
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-4 md:p-8">
+        <div className="flex justify-between items-center mb-6 md:mb-8">
           <div className="flex items-center gap-3">
             <div className="bg-green-100 p-2 rounded-lg">
-              <Plus className="text-green-600" size={24} />
+              <Plus className="text-green-600" size={20} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800">নতুন নোট যোগ করুন</h2>
+            <h2 className="text-xl md:text-3xl font-bold text-gray-800">নতুন নোট যোগ করুন</h2>
           </div>
           <button 
             onClick={() => setShowAddForm(false)}
             className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-all"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
@@ -373,7 +373,7 @@ function App() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
               placeholder="যেমন: অধ্যায় ১ - সম্পূর্ণ নোট"
             />
           </div>
@@ -384,7 +384,7 @@ function App() {
               type="text"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
               placeholder="আপনার নাম লিখুন"
             />
           </div>
@@ -398,7 +398,7 @@ function App() {
                   setSelectedPaper(e.target.value)
                   setSelectedChapterId('1')
                 }}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
+                className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
               >
                 <option value="1st Paper">হিসাববিজ্ঞান ১ম পত্র</option>
                 <option value="2nd Paper">হিসাববিজ্ঞান ২য় পত্র</option>
@@ -410,7 +410,7 @@ function App() {
               <select
                 value={selectedChapterId}
                 onChange={(e) => setSelectedChapterId(e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
+                className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all"
               >
                 {availableChapters.map(chapter => (
                   <option key={chapter.id} value={chapter.id}>
@@ -428,14 +428,14 @@ function App() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-3 border-dashed rounded-xl p-8 text-center transition-all ${
+              className={`border-3 border-dashed rounded-xl p-4 md:p-8 text-center transition-all ${
                 isDragging 
                   ? 'border-green-500 bg-green-50' 
                   : 'border-gray-300 hover:border-green-400'
               }`}
             >
-              <Upload className="mx-auto mb-4 text-gray-400" size={48} />
-              <p className="text-gray-600 mb-2 font-medium">
+              <Upload className="mx-auto mb-4 text-gray-400" size={32} />
+              <p className="text-gray-600 mb-2 font-medium text-sm md:text-base">
                 ছবি টেনে এনে ছাড়ুন অথবা ক্লিক করুন
               </p>
               <input
@@ -448,7 +448,7 @@ function App() {
               />
               <label
                 htmlFor="file-upload"
-                className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 cursor-pointer transition-all font-medium"
+                className="inline-block bg-green-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-green-700 cursor-pointer transition-all font-medium text-sm md:text-base"
               >
                 ফাইল নির্বাচন করুন
               </label>
@@ -457,8 +457,8 @@ function App() {
             {uploadedImages.length > 0 && (
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-gray-700 font-semibold flex items-center gap-2">
-                    <FileImage size={20} className="text-green-600" />
+                  <p className="text-gray-700 font-semibold flex items-center gap-2 text-sm md:text-base">
+                    <FileImage size={16} className="text-green-600" />
                     {uploadedImages.length} টি ছবি নির্বাচিত
                   </p>
                 </div>
@@ -468,15 +468,15 @@ function App() {
                       <img
                         src={image}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                        className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-gray-200"
                       />
                       <button
                         onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                        className="absolute top-1 right-1 md:top-2 md:right-2 bg-red-500 text-white p-1 md:p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={12} />
                       </button>
-                      <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-1 left-1 md:bottom-2 md:left-2 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 md:px-2 md:py-1 rounded">
                         পৃষ্ঠা {index + 1}
                       </div>
                     </div>
@@ -489,7 +489,7 @@ function App() {
           <button
             onClick={handleSubmit}
             disabled={uploadedFiles.length === 0 || !title || !authorName || submitting}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 md:py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'সংরক্ষণ করা হচ্ছে...' : 'নোট সংরক্ষণ করুন'}
           </button>
@@ -571,13 +571,12 @@ function App() {
     const availableChapters = selectedPaper === '1st Paper' ? accounting1Chapters : accounting2Chapters
 
     return (
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-4 md:p-8">
+        <div className="flex justify-between items-center mb-6 md:mb-8">
           <div className="flex items-center gap-3">
             <div className="bg-blue-100 p-2 rounded-lg">
-              <Edit className="text-blue-600" size={24} />
+              <Edit className="text-blue-600" size={20} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800">নোট এডিট করুন</h2>
           </div>
           <button 
             onClick={() => {
@@ -586,7 +585,7 @@ function App() {
             }}
             className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-all"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
@@ -597,7 +596,7 @@ function App() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
               placeholder="যেমন: অধ্যায় ১ - সম্পূর্ণ নোট"
             />
           </div>
@@ -608,7 +607,7 @@ function App() {
               type="text"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
               placeholder="আপনার নাম লিখুন"
             />
           </div>
@@ -622,7 +621,7 @@ function App() {
                   setSelectedPaper(e.target.value)
                   setSelectedChapterId('1')
                 }}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+                className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
               >
                 <option value="1st Paper">হিসাববিজ্ঞান ১ম পত্র</option>
                 <option value="2nd Paper">হিসাববিজ্ঞান ২য় পত্র</option>
@@ -634,7 +633,7 @@ function App() {
               <select
                 value={selectedChapterId}
                 onChange={(e) => setSelectedChapterId(e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+                className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
               >
                 {availableChapters.map(chapter => (
                   <option key={chapter.id} value={chapter.id}>
@@ -655,15 +654,15 @@ function App() {
                     <img
                       src={image}
                       alt={`Existing ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                      className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-gray-200"
                     />
                     <button
                       onClick={() => removeExistingImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                      className="absolute top-1 right-1 md:top-2 md:right-2 bg-red-500 text-white p-1 md:p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={12} />
                     </button>
-                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                    <div className="absolute bottom-1 left-1 md:bottom-2 md:left-2 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 md:px-2 md:py-1 rounded">
                       পৃষ্ঠা {index + 1}
                     </div>
                   </div>
@@ -680,14 +679,14 @@ function App() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-3 border-dashed rounded-xl p-8 text-center transition-all ${
+              className={`border-3 border-dashed rounded-xl p-4 md:p-8 text-center transition-all ${
                 isDragging 
                   ? 'border-blue-500 bg-blue-50' 
                   : 'border-gray-300 hover:border-blue-400'
               }`}
             >
-              <Upload className="mx-auto mb-4 text-gray-400" size={48} />
-              <p className="text-gray-600 mb-2 font-medium">
+              <Upload className="mx-auto mb-4 text-gray-400" size={32} />
+              <p className="text-gray-600 mb-2 font-medium text-sm md:text-base">
                 নতুন ছবি টেনে এনে ছাড়ুন অথবা ক্লিক করুন
               </p>
               <input
@@ -700,7 +699,7 @@ function App() {
               />
               <label
                 htmlFor="edit-file-upload"
-                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 cursor-pointer transition-all font-medium"
+                className="inline-block bg-blue-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-blue-700 cursor-pointer transition-all font-medium text-sm md:text-base"
               >
                 নতুন ফাইল যোগ করুন
               </label>
@@ -709,8 +708,8 @@ function App() {
             {newImagePreviews.length > 0 && (
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-gray-700 font-semibold flex items-center gap-2">
-                    <FileImage size={20} className="text-blue-600" />
+                  <p className="text-gray-700 font-semibold flex items-center gap-2 text-sm md:text-base">
+                    <FileImage size={16} className="text-blue-600" />
                     {newImagePreviews.length} টি নতুন ছবি যোগ করা হয়েছে
                   </p>
                 </div>
@@ -720,15 +719,15 @@ function App() {
                       <img
                         src={image}
                         alt={`New Preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border-2 border-blue-200"
+                        className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-blue-200"
                       />
                       <button
                         onClick={() => removeNewImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                        className="absolute top-1 right-1 md:top-2 md:right-2 bg-red-500 text-white p-1 md:p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={12} />
                       </button>
-                      <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-1 left-1 md:bottom-2 md:left-2 bg-blue-600 text-white text-xs px-1 py-0.5 md:px-2 md:py-1 rounded">
                         নতুন {index + 1}
                       </div>
                     </div>
@@ -741,7 +740,7 @@ function App() {
           <button
             onClick={handleSubmit}
             disabled={(existingImages.length === 0 && newImages.length === 0) || !title || !authorName || submitting}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 md:py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'আপডেট করা হচ্ছে...' : 'নোট আপডেট করুন'}
           </button>
@@ -756,98 +755,106 @@ function App() {
 
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header Section - Mobile Optimized */}
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <button 
               onClick={() => {
                 setSelectedChapter(null)
                 setSelectedNoteId(null)
                 setCurrentImageIndex(0)
               }}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold hover:bg-blue-50 px-4 py-2 rounded-lg transition-all"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold hover:bg-blue-50 px-3 py-2 rounded-lg transition-all w-fit"
             >
-              <ArrowLeft size={20} />
-              ফিরে যান
+              <ArrowLeft size={18} />
+              <span className="text-sm md:text-base">ফিরে যান</span>
             </button>
             
             <div className="text-center flex-1">
-              <h2 className="text-2xl font-bold text-gray-800">{selectedChapter.title}</h2>
-              <p className="text-sm text-gray-500 mt-1">{selectedChapter.paper}</p>
+              <h2 className="text-lg md:text-2xl font-bold text-gray-800 break-words">{selectedChapter.title}</h2>
+              <p className="text-xs md:text-sm text-gray-500 mt-1">{selectedChapter.paper}</p>
             </div>
 
             <button 
               onClick={() => setShowAddForm(true)}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all font-semibold"
+              className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-all font-semibold text-sm md:text-base w-fit md:w-auto"
             >
-              <Plus size={20} />
-              নোট যুক্ত করুন
+              <Plus size={16} />
+              <span>নোট যুক্ত করুন</span>
             </button>
           </div>
         </div>
 
         {selectedNote ? (
           <>
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
+            {/* Note Viewer - Mobile Optimized */}
+            <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
+              {/* Note Header - Mobile Optimized */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
                 <button
                   onClick={() => {
                     setSelectedNoteId(null)
                     setCurrentImageIndex(0)
                   }}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-semibold hover:bg-gray-100 px-3 py-2 rounded-lg transition-all"
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-semibold hover:bg-gray-100 px-3 py-2 rounded-lg transition-all w-fit"
                 >
-                  <ArrowLeft size={18} />
-                  নোট তালিকায় ফিরুন
+                  <ArrowLeft size={16} />
+                  <span className="text-sm">নোট তালিকায় ফিরুন</span>
                 </button>
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-800">{selectedNote.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
-                    <User size={16} />
+                <div className="text-center flex-1">
+                  <h3 className="text-base md:text-xl font-bold text-gray-800 break-words">{selectedNote.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
+                    <User size={12} />
                     {selectedNote.authorName} - এর নোট
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-center md:justify-end">
                   <button
                     onClick={() => editNote(selectedNote)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all font-semibold"
+                    className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg hover:bg-blue-700 transition-all font-semibold text-xs md:text-sm"
                   >
-                    <Edit size={18} />
-                    এডিট
+                    <Edit size={14} />
+                    <span>এডিট</span>
                   </button>
                   <button
                     onClick={() => deleteNote(selectedNote._id)}
-                    className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-all font-semibold"
+                    className="flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg hover:bg-red-700 transition-all font-semibold text-xs md:text-sm"
                   >
-                    <Trash2 size={18} />
-                    মুছুন
+                    <Trash2 size={14} />
+                    <span>মুছুন</span>
                   </button>
                 </div>
               </div>
-              <img 
-                src={selectedNote.images[currentImageIndex]}
-                alt={`Note page ${currentImageIndex + 1}`}
-                className="w-full h-auto max-h-[700px] object-contain mx-auto rounded-lg shadow-md"
-                onError={(e) => {
-                  console.error('Image failed to load:', selectedNote.images[currentImageIndex]);
-                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
-                }}
-              />
+              
+              {/* Image Display - Mobile Optimized */}
+              <div className="bg-gray-50 rounded-lg p-2">
+                <img 
+                  src={selectedNote.images[currentImageIndex]}
+                  alt={`Note page ${currentImageIndex + 1}`}
+                  className="w-full h-auto max-h-[60vh] md:max-h-[700px] object-contain mx-auto rounded-lg"
+                  onError={(e) => {
+                    console.error('Image failed to load:', selectedNote.images[currentImageIndex]);
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+                  }}
+                />
+              </div>
             </div>
 
+            {/* Navigation - Mobile Optimized */}
             {selectedNote.images.length > 1 && (
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <div className="flex justify-between items-center">
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                   <button 
                     onClick={() => setCurrentImageIndex(prev => Math.max(0, prev - 1))}
                     disabled={currentImageIndex === 0}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-all font-semibold"
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-all font-semibold text-sm md:text-base w-full md:w-auto justify-center"
                   >
-                    <ChevronLeft size={20} />
-                    আগের পৃষ্ঠা
+                    <ChevronLeft size={18} />
+                    <span>আগের পৃষ্ঠা</span>
                   </button>
                   
                   <div className="text-center">
-                    <span className="text-gray-700 font-bold text-lg">
+                    <span className="text-gray-700 font-bold text-base md:text-lg">
                       পৃষ্ঠা {currentImageIndex + 1} / {selectedNote.images.length}
                     </span>
                   </div>
@@ -855,23 +862,24 @@ function App() {
                   <button 
                     onClick={() => setCurrentImageIndex(prev => Math.min(selectedNote.images.length - 1, prev + 1))}
                     disabled={currentImageIndex === selectedNote.images.length - 1}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-all font-semibold"
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-all font-semibold text-sm md:text-base w-full md:w-auto justify-center"
                   >
-                    পরের পৃষ্ঠা
-                    <ChevronRight size={20} />
+                    <span>পরের পৃষ্ঠা</span>
+                    <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
             )}
           </>
         ) : (
+          // Notes List - Mobile Optimized
           <div>
             {chapterNotes.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {chapterNotes.map(note => (
                   <div 
                     key={note._id}
-                    className="bg-white p-5 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-400 transition-all transform hover:-translate-y-1"
+                    className="bg-white p-4 md:p-5 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-400 transition-all transform hover:-translate-y-1"
                   >
                     <div 
                       onClick={() => {
@@ -880,27 +888,27 @@ function App() {
                       }}
                       className="cursor-pointer"
                     >
-                      <div className="relative mb-4 overflow-hidden rounded-lg">
+                      <div className="relative mb-3 md:mb-4 overflow-hidden rounded-lg">
                         <img 
                           src={note.images[0]}
                           alt={note.title}
-                          className="w-full h-48 object-cover"
+                          className="w-full h-32 md:h-48 object-cover"
                           onError={(e) => {
                             console.error('Thumbnail failed to load:', note.images[0]);
                             e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f0f0f0" width="300" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
                           }}
                         />
-                        <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full font-semibold">
                           {note.images.length} পৃষ্ঠা
                         </div>
                       </div>
-                      <h3 className="font-bold text-gray-800 text-lg mb-2">{note.title}</h3>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
-                          <User size={14} />
+                      <h3 className="font-bold text-gray-800 text-base md:text-lg mb-2 line-clamp-2">{note.title}</h3>
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
+                        <p className="text-xs md:text-sm text-gray-600 flex items-center gap-1">
+                          <User size={12} />
                           {note.authorName}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-gray-500">
                           তারিখ: {new Date(note.createdAt).toLocaleDateString('bn-BD')}
                         </p>
                       </div>
@@ -911,29 +919,29 @@ function App() {
                           setSelectedNoteId(note._id);
                           setCurrentImageIndex(0);
                         }}
-                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all text-sm font-semibold"
+                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all text-xs md:text-sm font-semibold"
                       >
                         দেখুন
                       </button>
-                      <button 
+                      {/* <button 
                         onClick={() => editNote(note)}
-                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-all text-sm font-semibold"
+                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-all text-xs md:text-sm font-semibold"
                       >
                         এডিট
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-2xl shadow-lg">
-                <BookOpen className="mx-auto mb-4 text-gray-300" size={64} />
-                <p className="text-gray-500 text-lg mb-2">এই অধ্যায়ের জন্য কোনো নোট নেই</p>
+              <div className="text-center py-12 md:py-20 bg-white rounded-2xl shadow-lg">
+                <BookOpen className="mx-auto mb-4 text-gray-300" size={48} />
+                <p className="text-gray-500 text-base md:text-lg mb-2">এই অধ্যায়ের জন্য কোনো নোট নেই</p>
                 <button 
                   onClick={() => setShowAddForm(true)}
-                  className="mt-4 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold inline-flex items-center gap-2"
+                  className="mt-4 bg-green-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-green-700 font-semibold inline-flex items-center gap-2 text-sm md:text-base"
                 >
-                  <Plus size={20} />
+                  <Plus size={16} />
                   নোট যোগ করুন
                 </button>
               </div>
@@ -950,12 +958,12 @@ function App() {
     
     return (
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="inline-block bg-gradient-to-r from-blue-600 to-green-600 p-4 rounded-2xl mb-4">
-            <BookOpen className="text-white" size={48} />
+        <div className="text-center mb-8 md:mb-10">
+          <div className="inline-block bg-gradient-to-r from-blue-600 to-green-600 p-3 md:p-4 rounded-2xl mb-4">
+            <BookOpen className="text-white" size={32} />
           </div>
-          <h1 className="text-5xl font-bold text-gray-800 mb-3">হিসাববিজ্ঞান নোট</h1>
-          <p className="text-gray-600 text-xl">১ম ও ২য় পত্রের সকল অধ্যায়ের নোট এক জায়গায়</p>
+          <h1 className="text-2xl md:text-5xl font-bold text-gray-800 mb-3">হিসাববিজ্ঞান নোট</h1>
+          <p className="text-gray-600 text-base md:text-xl">১ম ও ২য় পত্রের সকল অধ্যায়ের নোট এক জায়গায়</p>
         </div>
 
         {loading && (
@@ -965,31 +973,31 @@ function App() {
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-6 md:mb-8">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="অধ্যায় খুঁজুন..."
-              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg"
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-base"
             />
           </div>
           
           <button 
             onClick={() => setShowAddForm(true)}
-            className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center justify-center gap-2"
+            className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 md:px-8 md:py-4 rounded-xl hover:from-green-700 hover:to-green-800 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center justify-center gap-2"
           >
-            <Plus size={24} />
-            নতুন নোট যোগ করুন
+            <Plus size={18} />
+            <span>নতুন নোট যোগ করুন</span>
           </button>
         </div>
 
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-6 md:mb-8">
           <button
             onClick={() => setSelectedPaperFilter('all')}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+            className={`px-4 py-2 md:px-6 md:py-3 rounded-xl font-semibold transition-all text-sm md:text-base ${
               selectedPaperFilter === 'all'
                 ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -999,7 +1007,7 @@ function App() {
           </button>
           <button
             onClick={() => setSelectedPaperFilter('1st')}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+            className={`px-4 py-2 md:px-6 md:py-3 rounded-xl font-semibold transition-all text-sm md:text-base ${
               selectedPaperFilter === '1st'
                 ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -1009,7 +1017,7 @@ function App() {
           </button>
           <button
             onClick={() => setSelectedPaperFilter('2nd')}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+            className={`px-4 py-2 md:px-6 md:py-3 rounded-xl font-semibold transition-all text-sm md:text-base ${
               selectedPaperFilter === '2nd'
                 ? 'bg-green-600 text-white shadow-lg'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -1020,14 +1028,14 @@ function App() {
         </div>
 
         {(selectedPaperFilter === 'all' || selectedPaperFilter === '1st') && filtered1st.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-3">
+          <div className="mb-8 md:mb-12">
+            <h2 className="text-xl md:text-3xl font-bold text-blue-700 mb-4 md:mb-6 flex items-center gap-3">
               <div className="bg-blue-100 p-2 rounded-lg">
-                <BookOpen className="text-blue-700" size={28} />
+                <BookOpen className="text-blue-700" size={20} />
               </div>
-              হিসাববিজ্ঞান ১ম পত্র ({filtered1st.length} টি অধ্যায়)
+              <span>হিসাববিজ্ঞান ১ম পত্র ({filtered1st.length} টি অধ্যায়)</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filtered1st.map(chapter => {
                 const chapterNotes = getChapterNotes(chapter)
                 const hasNotes = chapterNotes.length > 0
@@ -1035,24 +1043,24 @@ function App() {
                   <div 
                     key={chapter.id}
                     onClick={() => setSelectedChapter(chapter)}
-                    className="bg-white p-6 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-300 transition-all transform hover:-translate-y-1"
+                    className="bg-white p-4 md:p-6 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-300 transition-all transform hover:-translate-y-1"
                   >
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-bold text-gray-800 text-lg flex-1">{chapter.title}</h3>
-                      <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1.5 rounded-full font-semibold whitespace-nowrap ml-2">
+                    <div className="flex justify-between items-start mb-3 md:mb-4">
+                      <h3 className="font-bold text-gray-800 text-base md:text-lg flex-1">{chapter.title}</h3>
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full font-semibold whitespace-nowrap ml-2">
                         ১ম পত্র
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className={`text-sm font-medium ${hasNotes ? 'text-green-600' : 'text-gray-400'}`}>
+                      <p className={`text-xs md:text-sm font-medium ${hasNotes ? 'text-green-600' : 'text-gray-400'}`}>
                         {hasNotes 
                           ? `✓ ${chapterNotes.length} টি নোট আছে` 
                           : 'নোট যোগ করুন'
                         }
                       </p>
                       {hasNotes && (
-                        <div className="bg-green-100 p-2 rounded-lg">
-                          <FileImage className="text-green-600" size={18} />
+                        <div className="bg-green-100 p-1.5 md:p-2 rounded-lg">
+                          <FileImage className="text-green-600" size={14} />
                         </div>
                       )}
                     </div>
@@ -1065,13 +1073,13 @@ function App() {
 
         {(selectedPaperFilter === 'all' || selectedPaperFilter === '2nd') && filtered2nd.length > 0 && (
           <div>
-            <h2 className="text-3xl font-bold text-green-700 mb-6 flex items-center gap-3">
+            <h2 className="text-xl md:text-3xl font-bold text-green-700 mb-4 md:mb-6 flex items-center gap-3">
               <div className="bg-green-100 p-2 rounded-lg">
-                <BookOpen className="text-green-700" size={28} />
+                <BookOpen className="text-green-700" size={20} />
               </div>
-              হিসাববিজ্ঞান ২য় পত্র ({filtered2nd.length} টি অধ্যায়)
+              <span>হিসাববিজ্ঞান ২য় পত্র ({filtered2nd.length} টি অধ্যায়)</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filtered2nd.map(chapter => {
                 const chapterNotes = getChapterNotes(chapter)
                 const hasNotes = chapterNotes.length > 0
@@ -1079,24 +1087,24 @@ function App() {
                   <div 
                     key={chapter.id}
                     onClick={() => setSelectedChapter(chapter)}
-                    className="bg-white p-6 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-green-300 transition-all transform hover:-translate-y-1"
+                    className="bg-white p-4 md:p-6 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-green-300 transition-all transform hover:-translate-y-1"
                   >
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-bold text-gray-800 text-lg flex-1">{chapter.title}</h3>
-                      <span className="bg-green-100 text-green-800 text-xs px-3 py-1.5 rounded-full font-semibold whitespace-nowrap ml-2">
+                    <div className="flex justify-between items-start mb-3 md:mb-4">
+                      <h3 className="font-bold text-gray-800 text-base md:text-lg flex-1">{chapter.title}</h3>
+                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full font-semibold whitespace-nowrap ml-2">
                         ২য় পত্র
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className={`text-sm font-medium ${hasNotes ? 'text-green-600' : 'text-gray-400'}`}>
+                      <p className={`text-xs md:text-sm font-medium ${hasNotes ? 'text-green-600' : 'text-gray-400'}`}>
                         {hasNotes 
                           ? `✓ ${chapterNotes.length} টি নোট আছে` 
                           : 'নোট যোগ করুন'
                         }
                       </p>
                       {hasNotes && (
-                        <div className="bg-green-100 p-2 rounded-lg">
-                          <FileImage className="text-green-600" size={18} />
+                        <div className="bg-green-100 p-1.5 md:p-2 rounded-lg">
+                          <FileImage className="text-green-600" size={14} />
                         </div>
                       )}
                     </div>
@@ -1108,10 +1116,10 @@ function App() {
         )}
 
         {searchTerm && filtered1st.length === 0 && filtered2nd.length === 0 && (
-          <div className="text-center py-20">
-            <Search className="mx-auto mb-4 text-gray-300" size={64} />
-            <p className="text-gray-500 text-xl">কোনো অধ্যায় পাওয়া যায়নি</p>
-            <p className="text-gray-400 mt-2">অন্য কিছু খুঁজে দেখুন</p>
+          <div className="text-center py-12 md:py-20">
+            <Search className="mx-auto mb-4 text-gray-300" size={48} />
+            <p className="text-gray-500 text-base md:text-xl">কোনো অধ্যায় পাওয়া যায়নি</p>
+            <p className="text-gray-400 mt-2 text-sm md:text-base">অন্য কিছু খুঁজে দেখুন</p>
           </div>
         )}
       </div>
@@ -1119,7 +1127,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-4 md:py-8 px-4">
       <div className="container mx-auto">
         {showAddForm ? (
           <AddNotesForm />
