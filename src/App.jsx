@@ -1,91 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle } from 'lucide-react'
+import { BookOpen, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Upload, FileImage, Trash2, Search, User, CheckCircle, Edit } from 'lucide-react'
 
-// API Service - Updated for Vercel proxy
-const API_BASE_URL = '/api';
-
-const apiService = {
-  async getNotes() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notes`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const notes = await response.json();
-      
-      // Images will be served through /uploads proxy
-      return notes.map(note => ({
-        ...note,
-        images: note.images.map(img => {
-          if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
-          // If it's just the filename, prepend /uploads
-          return `/uploads/${img}`;
-        })
-      }));
-    } catch (error) {
-      console.error('Error fetching notes:', error);
-      throw error;
-    }
-  },
-
-  async createNote(noteData) {
-    try {
-      const formData = new FormData();
-      
-      // Add text fields
-      formData.append('title', noteData.title);
-      formData.append('authorName', noteData.authorName);
-      formData.append('paper', noteData.paper);
-      formData.append('chapterId', noteData.chapterId.toString());
-      
-      // Add image files
-      noteData.images.forEach((imageFile, index) => {
-        formData.append('images', imageFile);
-      });
-
-      const response = await fetch(`${API_BASE_URL}/notes`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
-      
-      const savedNote = await response.json();
-      
-      // Ensure response images use /uploads proxy path
-      return {
-        ...savedNote,
-        images: savedNote.images.map(img => {
-          if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
-          return `/uploads/${img}`;
-        })
-      };
-    } catch (error) {
-      console.error('Error creating note:', error);
-      throw error;
-    }
-  },
-
-  async deleteNote(noteId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Network response was not ok');
-      return await response.json();
-    } catch (error) {
-      console.error('Error deleting note:', error);
-      throw error;
-    }
-  }
-};
+// API Base URL
+const API_BASE_URL = 'https://acc-backend-4.onrender.com/api';
 
 function App() {
   const [selectedChapter, setSelectedChapter] = useState(null)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editingNote, setEditingNote] = useState(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [notes, setNotes] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -96,6 +19,103 @@ function App() {
   const [showPinModal, setShowPinModal] = useState(false)
   const [pinInput, setPinInput] = useState('')
   const [noteToDelete, setNoteToDelete] = useState(null)
+
+  // API Service Functions
+  const apiService = {
+    async getNotes() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/notes`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const notes = await response.json();
+        return notes;
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+        throw error;
+      }
+    },
+
+    async createNote(noteData) {
+      try {
+        const formData = new FormData();
+        
+        // Add text fields
+        formData.append('title', noteData.title);
+        formData.append('authorName', noteData.authorName);
+        formData.append('paper', noteData.paper);
+        formData.append('chapterId', noteData.chapterId.toString());
+        
+        // Add image files
+        noteData.images.forEach((imageFile, index) => {
+          formData.append('images', imageFile);
+        });
+
+        const response = await fetch(`${API_BASE_URL}/notes`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+        
+        const savedNote = await response.json();
+        return savedNote;
+      } catch (error) {
+        console.error('Error creating note:', error);
+        throw error;
+      }
+    },
+
+    async updateNote(noteId, noteData) {
+      try {
+        const formData = new FormData();
+        
+        // Add text fields
+        formData.append('title', noteData.title);
+        formData.append('authorName', noteData.authorName);
+        formData.append('paper', noteData.paper);
+        formData.append('chapterId', noteData.chapterId.toString());
+        formData.append('existingImages', JSON.stringify(noteData.existingImages || []));
+        
+        // Add new image files if any
+        if (noteData.newImages && noteData.newImages.length > 0) {
+          noteData.newImages.forEach((imageFile) => {
+            formData.append('images', imageFile);
+          });
+        }
+
+        const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
+          method: 'PUT',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+        
+        const updatedNote = await response.json();
+        return updatedNote;
+      } catch (error) {
+        console.error('Error updating note:', error);
+        throw error;
+      }
+    },
+
+    async deleteNote(noteId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+      } catch (error) {
+        console.error('Error deleting note:', error);
+        throw error;
+      }
+    }
+  };
 
   // Load notes from backend on component mount
   useEffect(() => {
@@ -145,6 +165,28 @@ function App() {
     )
   }
 
+  // Edit note function
+  const editNote = (note) => {
+    setEditingNote(note);
+    setShowEditForm(true);
+  }
+
+  // Update note function
+  const updateNote = async (updatedNoteData) => {
+    try {
+      const updatedNote = await apiService.updateNote(editingNote._id, updatedNoteData);
+      setNotes(prev => prev.map(note => 
+        note._id === editingNote._id ? updatedNote : note
+      ));
+      setShowEditForm(false);
+      setEditingNote(null);
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error('Error updating note:', error);
+      alert(`নোট আপডেট করতে সমস্যা হয়েছে: ${error.message}`);
+    }
+  }
+
   const deleteNote = async (noteId) => {
     setNoteToDelete(noteId);
     setShowPinModal(true);
@@ -185,7 +227,7 @@ function App() {
             <CheckCircle className="text-green-600" size={32} />
           </div>
         </div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">নোট যোগ করা হয়েছে!</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">সফল!</h3>
         <p className="text-gray-600 mb-6">আপনার নোট সফলভাবে সংরক্ষণ করা হয়েছে।</p>
         <button
           onClick={() => setShowSuccessPopup(false)}
@@ -456,6 +498,258 @@ function App() {
     )
   }
 
+  const EditNotesForm = () => {
+    const [title, setTitle] = useState(editingNote?.title || '')
+    const [authorName, setAuthorName] = useState(editingNote?.authorName || '')
+    const [selectedPaper, setSelectedPaper] = useState(editingNote?.paper || '1st Paper')
+    const [selectedChapterId, setSelectedChapterId] = useState(editingNote?.chapterId?.toString() || '1')
+    const [existingImages, setExistingImages] = useState(editingNote?.images || [])
+    const [newImages, setNewImages] = useState([])
+    const [newImagePreviews, setNewImagePreviews] = useState([])
+    const [isDragging, setIsDragging] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
+
+    const handleNewImageUpload = (e) => {
+      const files = Array.from(e.target.files)
+      handleNewFiles(files)
+    }
+
+    const handleDragOver = (e) => {
+      e.preventDefault()
+      setIsDragging(true)
+    }
+
+    const handleDragLeave = () => {
+      setIsDragging(false)
+    }
+
+    const handleDrop = (e) => {
+      e.preventDefault()
+      setIsDragging(false)
+      const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'))
+      handleNewFiles(files)
+    }
+
+    const handleNewFiles = (files) => {
+      const imagePreviews = files.map(file => URL.createObjectURL(file))
+      setNewImagePreviews(prev => [...prev, ...imagePreviews])
+      setNewImages(prev => [...prev, ...files])
+    }
+
+    const removeExistingImage = (index) => {
+      setExistingImages(prev => prev.filter((_, i) => i !== index))
+    }
+
+    const removeNewImage = (index) => {
+      setNewImagePreviews(prev => prev.filter((_, i) => i !== index))
+      setNewImages(prev => prev.filter((_, i) => i !== index))
+    }
+
+    const handleSubmit = async () => {
+      if (!title || !authorName || (existingImages.length === 0 && newImages.length === 0)) {
+        alert('দয়া করে শিরোনাম, আপনার নাম এবং অন্তত একটি ছবি যোগ করুন')
+        return
+      }
+      
+      setSubmitting(true);
+      try {
+        await updateNote({
+          title,
+          authorName,
+          paper: selectedPaper,
+          chapterId: parseInt(selectedChapterId),
+          existingImages,
+          newImages
+        });
+      } catch (error) {
+        console.error('Error updating note:', error);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
+    const availableChapters = selectedPaper === '1st Paper' ? accounting1Chapters : accounting2Chapters
+
+    return (
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 p-2 rounded-lg">
+              <Edit className="text-blue-600" size={24} />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-800">নোট এডিট করুন</h2>
+          </div>
+          <button 
+            onClick={() => {
+              setShowEditForm(false)
+              setEditingNote(null)
+            }}
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-all"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-gray-700 mb-2 font-semibold">নোটের শিরোনাম</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              placeholder="যেমন: অধ্যায় ১ - সম্পূর্ণ নোট"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2 font-semibold">আপনার নাম</label>
+            <input
+              type="text"
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              placeholder="আপনার নাম লিখুন"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 mb-2 font-semibold">পেপার নির্বাচন করুন</label>
+              <select
+                value={selectedPaper}
+                onChange={(e) => {
+                  setSelectedPaper(e.target.value)
+                  setSelectedChapterId('1')
+                }}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              >
+                <option value="1st Paper">হিসাববিজ্ঞান ১ম পত্র</option>
+                <option value="2nd Paper">হিসাববিজ্ঞান ২য় পত্র</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2 font-semibold">অধ্যায় নির্বাচন করুন</label>
+              <select
+                value={selectedChapterId}
+                onChange={(e) => setSelectedChapterId(e.target.value)}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
+              >
+                {availableChapters.map(chapter => (
+                  <option key={chapter.id} value={chapter.id}>
+                    {chapter.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Existing Images */}
+          {existingImages.length > 0 && (
+            <div>
+              <label className="block text-gray-700 mb-3 font-semibold">বর্তমান ছবি</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {existingImages.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image}
+                      alt={`Existing ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                    />
+                    <button
+                      onClick={() => removeExistingImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                      পৃষ্ঠা {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* New Images Upload */}
+          <div>
+            <label className="block text-gray-700 mb-3 font-semibold">নতুন ছবি যোগ করুন</label>
+            
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`border-3 border-dashed rounded-xl p-8 text-center transition-all ${
+                isDragging 
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-300 hover:border-blue-400'
+              }`}
+            >
+              <Upload className="mx-auto mb-4 text-gray-400" size={48} />
+              <p className="text-gray-600 mb-2 font-medium">
+                নতুন ছবি টেনে এনে ছাড়ুন অথবা ক্লিক করুন
+              </p>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleNewImageUpload}
+                className="hidden"
+                id="edit-file-upload"
+              />
+              <label
+                htmlFor="edit-file-upload"
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 cursor-pointer transition-all font-medium"
+              >
+                নতুন ফাইল যোগ করুন
+              </label>
+            </div>
+            
+            {newImagePreviews.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-gray-700 font-semibold flex items-center gap-2">
+                    <FileImage size={20} className="text-blue-600" />
+                    {newImagePreviews.length} টি নতুন ছবি যোগ করা হয়েছে
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {newImagePreviews.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={image}
+                        alt={`New Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border-2 border-blue-200"
+                      />
+                      <button
+                        onClick={() => removeNewImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                        নতুন {index + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={(existingImages.length === 0 && newImages.length === 0) || !title || !authorName || submitting}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting ? 'আপডেট করা হচ্ছে...' : 'নোট আপডেট করুন'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const NotesViewer = () => {
     const chapterNotes = getChapterNotes(selectedChapter)
     const selectedNote = chapterNotes.find(note => note._id === selectedNoteId)
@@ -512,13 +806,22 @@ function App() {
                     {selectedNote.authorName} - এর নোট
                   </p>
                 </div>
-                <button
-                  onClick={() => deleteNote(selectedNote._id)}
-                  className="flex items-center gap-2 text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-2 rounded-lg transition-all font-semibold"
-                >
-                  <Trash2 size={18} />
-                  মুছুন
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => editNote(selectedNote)}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all font-semibold"
+                  >
+                    <Edit size={18} />
+                    এডিট
+                  </button>
+                  <button
+                    onClick={() => deleteNote(selectedNote._id)}
+                    className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-all font-semibold"
+                  >
+                    <Trash2 size={18} />
+                    মুছুন
+                  </button>
+                </div>
               </div>
               <img 
                 src={selectedNote.images[currentImageIndex]}
@@ -568,35 +871,56 @@ function App() {
                 {chapterNotes.map(note => (
                   <div 
                     key={note._id}
-                    onClick={() => {
-                      setSelectedNoteId(note._id)
-                      setCurrentImageIndex(0)
-                    }}
                     className="bg-white p-5 rounded-2xl shadow-md border-2 border-transparent cursor-pointer hover:shadow-xl hover:border-blue-400 transition-all transform hover:-translate-y-1"
                   >
-                    <div className="relative mb-4 overflow-hidden rounded-lg">
-                      <img 
-                        src={note.images[0]}
-                        alt={note.title}
-                        className="w-full h-48 object-cover"
-                        onError={(e) => {
-                          console.error('Thumbnail failed to load:', note.images[0]);
-                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f0f0f0" width="300" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                      <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
-                        {note.images.length} পৃষ্ঠা
+                    <div 
+                      onClick={() => {
+                        setSelectedNoteId(note._id);
+                        setCurrentImageIndex(0);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <div className="relative mb-4 overflow-hidden rounded-lg">
+                        <img 
+                          src={note.images[0]}
+                          alt={note.title}
+                          className="w-full h-48 object-cover"
+                          onError={(e) => {
+                            console.error('Thumbnail failed to load:', note.images[0]);
+                            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f0f0f0" width="300" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                          }}
+                        />
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
+                          {note.images.length} পৃষ্ঠা
+                        </div>
+                      </div>
+                      <h3 className="font-bold text-gray-800 text-lg mb-2">{note.title}</h3>
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                          <User size={14} />
+                          {note.authorName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          তারিখ: {new Date(note.createdAt).toLocaleDateString('bn-BD')}
+                        </p>
                       </div>
                     </div>
-                    <h3 className="font-bold text-gray-800 text-lg mb-2">{note.title}</h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600 flex items-center gap-1">
-                        <User size={14} />
-                        {note.authorName}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        তারিখ: {new Date(note.createdAt).toLocaleDateString('bn-BD')}
-                      </p>
+                    <div className="flex gap-2 mt-3">
+                      <button 
+                        onClick={() => {
+                          setSelectedNoteId(note._id);
+                          setCurrentImageIndex(0);
+                        }}
+                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all text-sm font-semibold"
+                      >
+                        দেখুন
+                      </button>
+                      <button 
+                        onClick={() => editNote(note)}
+                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-all text-sm font-semibold"
+                      >
+                        এডিট
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -799,6 +1123,8 @@ function App() {
       <div className="container mx-auto">
         {showAddForm ? (
           <AddNotesForm />
+        ) : showEditForm ? (
+          <EditNotesForm />
         ) : selectedChapter ? (
           <NotesViewer />
         ) : (
