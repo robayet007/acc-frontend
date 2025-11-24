@@ -14,12 +14,37 @@ const apiService = {
       // Images will be served through /uploads proxy
       return notes.map(note => ({
         ...note,
-        images: note.images.map(img => {
-          if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
-          // If it's just the filename, prepend /uploads
-          return `/uploads/${img}`;
-        })
+        images: (note.images || []).map(img => {
+          if (!img) return img; // Handle null/undefined
+          
+          // If it's already a full URL, check if it's the backend URL
+          if (img.startsWith('http://') || img.startsWith('https://')) {
+            // If it's the backend URL, convert to proxy path
+            if (img.includes('52.62.132.187:5000/uploads/')) {
+              const filename = img.split('/uploads/')[1];
+              const proxyPath = `/uploads/${filename}`;
+              console.log(`Converted backend URL to proxy path: ${img} -> ${proxyPath}`);
+              return proxyPath;
+            }
+            // If it's a different full URL, return as is
+            return img;
+          }
+          
+          // If it already starts with /uploads, return as is
+          if (img.startsWith('/uploads/')) {
+            return img;
+          }
+          
+          // If it starts with 'uploads/' (without leading slash), add the slash
+          if (img.startsWith('uploads/')) {
+            return `/${img}`;
+          }
+          
+          // If it's just the filename, prepend /uploads/
+          const proxyPath = `/uploads/${img}`;
+          console.log(`Converted filename to proxy path: ${img} -> ${proxyPath}`);
+          return proxyPath;
+        }).filter(img => img) // Remove any null/undefined images
       }));
     } catch (error) {
       console.error('Error fetching notes:', error);
@@ -38,7 +63,7 @@ const apiService = {
       formData.append('chapterId', noteData.chapterId.toString());
       
       // Add image files
-      noteData.images.forEach((imageFile, index) => {
+      noteData.images.forEach((imageFile) => {
         formData.append('images', imageFile);
       });
 
@@ -57,11 +82,37 @@ const apiService = {
       // Ensure response images use /uploads proxy path
       return {
         ...savedNote,
-        images: savedNote.images.map(img => {
-          if (img.startsWith('http')) return img;
-          if (img.startsWith('/uploads')) return img; // Already correct for Vercel proxy
-          return `/uploads/${img}`;
-        })
+        images: (savedNote.images || []).map(img => {
+          if (!img) return img; // Handle null/undefined
+          
+          // If it's already a full URL, check if it's the backend URL
+          if (img.startsWith('http://') || img.startsWith('https://')) {
+            // If it's the backend URL, convert to proxy path
+            if (img.includes('52.62.132.187:5000/uploads/')) {
+              const filename = img.split('/uploads/')[1];
+              const proxyPath = `/uploads/${filename}`;
+              console.log(`Converted backend URL to proxy path: ${img} -> ${proxyPath}`);
+              return proxyPath;
+            }
+            // If it's a different full URL, return as is
+            return img;
+          }
+          
+          // If it already starts with /uploads, return as is
+          if (img.startsWith('/uploads/')) {
+            return img;
+          }
+          
+          // If it starts with 'uploads/' (without leading slash), add the slash
+          if (img.startsWith('uploads/')) {
+            return `/${img}`;
+          }
+          
+          // If it's just the filename, prepend /uploads/
+          const proxyPath = `/uploads/${img}`;
+          console.log(`Converted filename to proxy path: ${img} -> ${proxyPath}`);
+          return proxyPath;
+        }).filter(img => img) // Remove any null/undefined images
       };
     } catch (error) {
       console.error('Error creating note:', error);
